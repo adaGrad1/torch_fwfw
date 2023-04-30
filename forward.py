@@ -20,7 +20,7 @@ class FwFwLayer(nn.Module):
         return logit, next_in.detach()
     
 class FCNet(torch.nn.Module):
-    def __init__(self, dims):
+    def __init__(self, dims, dropout=0.2):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         super().__init__()
         self.linears = []
@@ -29,9 +29,9 @@ class FCNet(torch.nn.Module):
         self.nonlins = []
         for d in range(len(dims) - 1):
             self.linears += [nn.Linear(dims[d], dims[d+1])]
-            self.fwfws += [FwFwLayer()]
-            self.dropouts += [nn.Dropout(p=0.2)]
             self.nonlins += [nn.ReLU()]
+            self.fwfws += [FwFwLayer()]
+            self.dropouts += [nn.Dropout(p=dropout)]
         self.linears = nn.ModuleList(self.linears)
         self.fwfws = nn.ModuleList(self.fwfws)
         self.dropouts = nn.ModuleList(self.dropouts)
@@ -41,9 +41,9 @@ class FCNet(torch.nn.Module):
         logits = []
         for i in range(len(self.linears)):
             x = self.linears[i](x)
+            x = self.nonlins[i](x)
             logit, x = self.fwfws[i](x)
             x = self.dropouts[i](x)
-            x = self.nonlins[i](x)
             logits += [logit]
         return logits
     

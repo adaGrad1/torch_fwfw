@@ -66,6 +66,6 @@ class FwFw_Dataset(Dataset):
         return len(self.pos) + len(self.neg)
     def __getitem__(self, idx):
         if idx >= len(self.pos):
-            return self.neg[idx-len(self.pos)], 0.00
+            return self.neg[idx-len(self.pos)], 0.0
         else:
             return self.pos[idx], 1.0
