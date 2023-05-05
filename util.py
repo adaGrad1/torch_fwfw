@@ -8,8 +8,20 @@ from torchvision.transforms import Compose, ToTensor, Normalize, Lambda
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 import torch.nn.functional as F
+import os
+
+def return_and_create_fpath(fpath, fname):
+    to_return = fpath+fname
+    if not os.path.exists(fpath):
+        os.makedirs(fpath)
+    return to_return
 
 
+def modelpath(fname):
+    return return_and_create_fpath('./models/', fname)
+
+def datapath(fname):
+    return return_and_create_fpath('./data/', fname)
 
 def MNIST_loaders(train_batch_size=50000, test_batch_size=10000):
 
