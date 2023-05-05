@@ -7,6 +7,7 @@ from torchvision.datasets import MNIST
 from torchvision.transforms import Compose, ToTensor, Normalize, Lambda
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
+import numpy as np
 import torch.nn.functional as F
 import os
 
@@ -69,15 +70,25 @@ def fwfw_loss(true_labels : torch.Tensor, model_outs : list):
                 to_return += F.binary_cross_entropy_with_logits(probs, true_labels)
         return to_return
 
+class OneHot(Dataset):
+    def __init__(self, y, n_classes=10):
+        self.y = y
+        self.n_classes = n_classes
+    def __len__(self):
+        return len(self.y)
+    def __getitem__(self, idx):
+        return F.one_hot(self.y[idx], num_classes=self.n_classes)
+
 class FwFw_Dataset(Dataset):
     
-    def __init__(self, pos, neg):
-        self.pos = pos
-        self.neg = neg
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
     def __len__(self):
-        return len(self.pos) + len(self.neg)
+        return len(self.x)*2
     def __getitem__(self, idx):
-        if idx >= len(self.pos):
-            return self.neg[idx-len(self.pos)], 0.0
+        if idx >= len(self.x):
+            y_idx = np.random.randint(len(self.y), size=1)
+            return self.x[idx-len(self.x)], self.y[y_idx[0]], 0.0
         else:
-            return self.pos[idx], 1.0
+            return self.x[idx], self.y[idx], 1.0
