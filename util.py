@@ -45,22 +45,6 @@ def MNIST_loaders(train_batch_size=50000, test_batch_size=10000):
 
     return train_loader, test_loader
 
-
-def overlay_y_on_x(x, y):
-    """Replace the first 10 pixels of data [x] with one-hot-encoded label [y]
-    """
-    x_ = x.clone()
-    x_[:, :10] *= 0.0
-    x_[range(x.shape[0]), y] = x.max()
-    return x_
-    
-def visualize_sample(data, name='', idx=0):
-    reshaped = data[idx].cpu().reshape(28, 28)
-    plt.figure(figsize = (4, 4))
-    plt.title(name)
-    plt.imshow(reshaped, cmap="gray")
-    plt.show()
-
 def fwfw_loss(true_labels : torch.Tensor, model_outs : list):
         to_return = None
         for probs in model_outs:
